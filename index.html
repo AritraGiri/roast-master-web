@@ -222,7 +222,7 @@
             userProfile = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('https://roast-master-backend.onrender.com/profile', {
+                const response = await fetch('https://roast-master-backend-nvyo.onrender.com/profile', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ...userProfile, session_id: sessionID })
@@ -253,7 +253,7 @@
             agentEls.forEach(setAgentThinking);
 
             try {
-                const response = await fetch('https://roast-master-backend.onrender.com/chat', {
+                const response = await fetch('https://roast-master-backend-nvyo.onrender.com/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text, session_id: sessionID })
