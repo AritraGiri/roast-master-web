@@ -9,9 +9,10 @@ services:
     startCommand: gunicorn app:app
 
   # 🌐 2. The Static Web Frontend
-  - type: static
+  - type: web # 👈 Changed this from static to web
     name: roast-master-frontend
+    runtime: static # 👈 Added this line to let Render know it's a static site
     plan: free
     rootDir: roast-master-frontend
-    buildCommand: "" # No build command needed for plain HTML/CSS/JS
-    publishDir: "." # Serve the root of the frontend folder
+    buildCommand: "" 
+    publishDir: "."
