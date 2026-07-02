@@ -2,10 +2,13 @@
 app.py — Roast Master AI: Flask Backend
 ========================================
 Handles user sessions, Heat Level logic, and routing to the Orchestrator.
+Includes Flask-Limiter to prevent API spamming and credit drain.
 """
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from asgiref.sync import async_to_sync
 import uuid
 
@@ -13,10 +16,24 @@ import uuid
 from orchestrator import run_multi_agent_pipeline
 
 app = Flask(__name__)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CORS CONFIGURATION (Restricted to your deployment domains)
+# ══════════════════════════════════════════════════════════════════════════════
 CORS(app, resources={r"/*": {"origins": [
     "https://roast-master-frontend-gqv9.onrender.com",
     "https://aritragiri.github.io"
 ]}})  # Critical for frontend communication
+
+# ══════════════════════════════════════════════════════════════════════════════
+# RATE LIMITER CONFIGURATION (Anti-Spam Shield)
+# ══════════════════════════════════════════════════════════════════════════════
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    default_limits=["60 per minute", "200 per day"],  # Global safety net
+    storage_uri="memory://"
+)
 
 # In-memory storage for the hackathon session
 users = {}
@@ -33,7 +50,17 @@ def get_user_or_create(session_id):
         }
     return users[session_id]
 
+# ══════════════════════════════════════════════════════════════════════════════
+# ROUTING & ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.route("/", methods=["GET"])
+@limiter.exempt  # Allow anyone to ping the homepage root without counting against limits
+def home():
+    return "Roast Master AI backend is running 🔥"
+
 @app.route("/profile", methods=["POST"])
+@limiter.limit("5 per minute")  # Prevents bot accounts from creating endless profile sessions
 def profile():
     data = request.json
     session_id = data.get("session_id")
@@ -53,6 +80,7 @@ def profile():
     return jsonify({"success": True, "message": "Victim profile registered."})
 
 @app.route("/chat", methods=["POST"])
+@limiter.limit("5 per minute")  # Protects your heavy, concurrent multi-agent AI engine from spam
 def chat():
     data = request.json
     session_id = data.get("session_id")
@@ -67,8 +95,7 @@ def chat():
 
     try:
         # Build a clean profile slice — the orchestrator's prompt builders only
-        # expect these four keys. Passing the full `user` dict would leak `heat`
-        # and `message_count` into the f-strings inside orchestrator.py.
+        # expect these four keys.
         user_profile = {
             "name"   : user["name"],
             "major"  : user["major"],
@@ -79,7 +106,7 @@ def chat():
         # Call the Async Orchestrator from the Sync Flask route
         result = async_to_sync(run_multi_agent_pipeline)(
             message,
-            user_profile,   # ← clean slice, not the raw `user` dict
+            user_profile,
             user["heat"]
         )
         
@@ -108,10 +135,6 @@ def giveup():
             "heat": 10
         })
     return jsonify({"error": "User not found"}), 404
-
-@app.route("/")
-def home():
-    return "Roast Master AI backend is running 🔥"
 
 if __name__ == "__main__":
     # Never leave debug=True in production!
