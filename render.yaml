@@ -1,0 +1,17 @@
+services:
+  # 🤖 1. The Python/Flask Backend
+  - type: web
+    name: roast-master-backend
+    runtime: python
+    plan: free
+    rootDir: roast-master-backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+
+  # 🌐 2. The Static Web Frontend
+  - type: static
+    name: roast-master-frontend
+    plan: free
+    rootDir: roast-master-frontend
+    buildCommand: "" # No build command needed for plain HTML/CSS/JS
+    publishDir: "." # Serve the root of the frontend folder
