@@ -253,7 +253,7 @@ const API_URL = "https://roast-master-backend-govv.onrender.com";
             agentEls.forEach(setAgentThinking);
 
             try {
-                const response = await fetch(`${API_URL}/profile`, {
+                const response = await fetch(`${API_URL}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text, session_id: sessionID })
