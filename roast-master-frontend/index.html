@@ -182,7 +182,7 @@
 
     <script>
         // CONFIGURATION
-const API_URL = "https://roast-master-backend-nvyo.onrender.com";
+const API_URL = "https://roast-master-backend-govv.onrender.com";
 
         let userProfile = null;
         let heatLevel = 10;
@@ -222,7 +222,7 @@ const API_URL = "https://roast-master-backend-nvyo.onrender.com";
             userProfile = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('https://roast-master-backend-nvyo.onrender.com/profile', {
+                const response = await fetch('https://roast-master-backend-govv.onrender.com/profile', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ...userProfile, session_id: sessionID })
@@ -253,7 +253,7 @@ const API_URL = "https://roast-master-backend-nvyo.onrender.com";
             agentEls.forEach(setAgentThinking);
 
             try {
-                const response = await fetch('https://roast-master-backend-nvyo.onrender.com/chat', {
+                const response = await fetch('https://roast-master-backend-govv.onrender.com/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text, session_id: sessionID })
