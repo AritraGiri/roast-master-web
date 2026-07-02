@@ -13,7 +13,10 @@ import uuid
 from orchestrator import run_multi_agent_pipeline
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["https://aritragiri.github.io"]}})  # Critical for frontend communication
+CORS(app, resources={r"/*": {"origins": [
+    "https://roast-master-frontend-gqv9.onrender.com",
+    "https://aritragiri.github.io"
+]}})  # Critical for frontend communication
 
 # In-memory storage for the hackathon session
 users = {}
